@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pedro Connect</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="screen">
+      <div class="auth-card">
+        <div class="logo">
+          <i data-lucide="message-circle"></i>
+          <h1>Pedro Connect</h1>
+        </div>
+        <p class="tagline">Connect. Share. Belong.</p>
+
+        <div class="tabs">
+          <button id="tab-login" class="tab active">Login</button>
+          <button id="tab-signup" class="tab">Sign Up</button>
+        </div>
+
+        <form id="auth-form">
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="you@example.com" required />
+          </div>
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" required minlength="6" />
+          </div>
+          <div id="username-group" class="input-group hidden">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="pedro_fan" maxlength="24" />
+          </div>
+          <button type="submit" id="auth-btn" class="btn primary">Login</button>
+        </form>
+        <p id="auth-error" class="error"></p>
+      </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="main-screen" class="screen hidden">
+      <header class="topbar">
+        <div class="brand">
+          <i data-lucide="message-circle"></i>
+          <span>Pedro Connect</span>
+        </div>
+        <div class="user-menu">
+          <span id="current-user"></span>
+          <button id="logout-btn" class="btn icon" title="Logout">
+            <i data-lucide="log-out"></i>
+          </button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+          <nav>
+            <button class="nav-item active" data-view="home">
+              <i data-lucide="home"></i> Home
+            </button>
+            <button class="nav-item" data-view="profile">
+              <i data-lucide="user"></i> Profile
+            </button>
+          </nav>
+        </aside>
+
+        <!-- Feed -->
+        <section class="feed">
+          <!-- Compose -->
+          <div class="compose-card">
+            <textarea id="post-content" placeholder="What's happening?" maxlength="280" rows="3"></textarea>
+            <div class="compose-actions">
+              <span id="char-count">0/280</span>
+              <button id="post-btn" class="btn primary" disabled>Post</button>
+            </div>
+          </div>
+
+          <!-- Posts list -->
+          <div id="posts-list" class="posts-list">
+            <!-- Posts injected here -->
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/supabase-config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
