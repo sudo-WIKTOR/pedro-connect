@@ -1,14 +1,15 @@
 // ===== Pedro Connect – Client =====
-
 const { createClient } = supabase;
 let sb = null;
 let currentUser = null;
 let currentProfile = null;
+let currentView = 'home'; // 'home' or 'profile'
+let viewingProfileId = null;
 
 // ---------- Init ----------
 function initSupabase() {
   if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
-    console.warn('⚠️  Replace SUPABASE_URL and SUPABASE_ANON_KEY in js/supabase-config.js');
+    console.warn('⚠️ Replace SUPABASE_URL and SUPABASE_ANON_KEY in js/supabase-config.js');
     return null;
   }
   return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -74,9 +75,7 @@ authForm.addEventListener('submit', async (e) => {
       const { data, error } = await sb.auth.signUp({
         email,
         password,
-        options: {
-          data: { username: username }
-        }
+        options: { data: { username } }
       });
       if (error) throw error;
 
@@ -104,7 +103,6 @@ async function loadUser() {
   }
   currentUser = session.user;
 
-  // Load profile
   const { data: profile } = await sb
     .from('profiles')
     .select('*')
@@ -114,7 +112,7 @@ async function loadUser() {
   currentProfile = profile;
   currentUserEl.textContent = profile?.username ? `@${profile.username}` : currentUser.email;
   showMain();
-  await loadPosts();
+  showHome();
 }
 
 function showAuth() {
@@ -126,6 +124,165 @@ function showMain() {
   authScreen.classList.add('hidden');
   mainScreen.classList.remove('hidden');
   lucide.createIcons();
+}
+
+// ---------- Navigation ----------
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const view = btn.dataset.view;
+    if (view === 'home') showHome();
+    if (view === 'profile') showProfile(currentUser.id);
+  });
+});
+
+function showHome() {
+  currentView = 'home';
+  viewingProfileId = null;
+  document.querySelector('.compose-card').classList.remove('hidden');
+  loadPosts();
+}
+
+async function showProfile(userId) {
+  currentView = 'profile';
+  viewingProfileId = userId;
+  document.querySelector('.compose-card').classList.add('hidden');
+
+  // Load profile info
+  const { data: profile } = await sb
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  if (!profile) {
+    postsList.innerHTML = `<div class="empty-state"><p>User not found</p></div>`;
+    return;
+  }
+
+  // Check if following
+  let isFollowing = false;
+  if (currentUser && currentUser.id !== userId) {
+    const { data: follow } = await sb
+      .from('follows')
+      .select('id')
+      .eq('follower_id', currentUser.id)
+      .eq('following_id', userId)
+      .maybeSingle();
+    isFollowing = !!follow;
+  }
+
+  // Count followers / following
+  const { count: followersCount } = await sb
+    .from('follows')
+    .select('*', { count: 'exact', head: true })
+    .eq('following_id', userId);
+
+  const { count: followingCount } = await sb
+    .from('follows')
+    .select('*', { count: 'exact', head: true })
+    .eq('follower_id', userId);
+
+  // Render profile header
+  const isOwnProfile = currentUser && currentUser.id === userId;
+  const followBtnHtml = isOwnProfile ? '' : `
+    <button id="follow-btn" class="btn ${isFollowing ? '' : 'primary'}" style="width:auto; margin-top:1rem;">
+      ${isFollowing ? 'Following' : 'Follow'}
+    </button>
+  `;
+
+  postsList.innerHTML = `
+    <div class="post-card" style="margin-bottom:1.5rem;">
+      <div style="display:flex; align-items:center; gap:1rem;">
+        <div class="avatar" style="width:64px; height:64px; font-size:1.5rem;">
+          ${(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
+        </div>
+        <div>
+          <div style="font-weight:700; font-size:1.25rem;">${escapeHtml(profile.display_name || profile.username)}</div>
+          <div style="color:var(--text-muted);">@${escapeHtml(profile.username)}</div>
+          <div style="margin-top:0.5rem; color:var(--text-muted); font-size:0.9rem;">
+            <strong style="color:var(--text);">${followingCount || 0}</strong> Following
+            · 
+            <strong style="color:var(--text);">${followersCount || 0}</strong> Followers
+          </div>
+          ${followBtnHtml}
+        </div>
+      </div>
+    </div>
+    <div id="profile-posts"></div>
+  `;
+
+  // Follow button handler
+  const followBtn = document.getElementById('follow-btn');
+  if (followBtn) {
+    followBtn.addEventListener('click', () => toggleFollow(userId, followBtn));
+  }
+
+  // Load this user's posts
+  loadUserPosts(userId);
+}
+
+async function toggleFollow(userId, btn) {
+  if (!currentUser) return;
+
+  const isFollowing = btn.textContent.trim() === 'Following';
+
+  try {
+    if (isFollowing) {
+      await sb.from('follows').delete()
+        .eq('follower_id', currentUser.id)
+        .eq('following_id', userId);
+      btn.textContent = 'Follow';
+      btn.classList.add('primary');
+    } else {
+      await sb.from('follows').insert({
+        follower_id: currentUser.id,
+        following_id: userId
+      });
+      btn.textContent = 'Following';
+      btn.classList.remove('primary');
+    }
+    // Refresh counts
+    showProfile(userId);
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+async function loadUserPosts(userId) {
+  const container = document.getElementById('profile-posts');
+  if (!container) return;
+
+  container.innerHTML = '<div class="empty-state"><p>Loading posts…</p></div>';
+
+  const { data: posts, error } = await sb
+    .from('posts')
+    .select(`
+      id, body, created_at, user_id,
+      profiles!posts_user_id_fkey (username, display_name),
+      likes (id, user_id)
+    `)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    container.innerHTML = `<div class="empty-state"><p>${error.message}</p></div>`;
+    return;
+  }
+
+  if (!posts || posts.length === 0) {
+    container.innerHTML = `<div class="empty-state"><p>No posts yet</p></div>`;
+    return;
+  }
+
+  container.innerHTML = posts.map(p => renderPost(p)).join('');
+  lucide.createIcons();
+
+  document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', () => toggleLike(btn.dataset.postId, btn));
+  });
 }
 
 // ---------- Logout ----------
@@ -158,7 +315,8 @@ postBtn.addEventListener('click', async () => {
     if (error) throw error;
     postContent.value = '';
     charCount.textContent = '0/280';
-    await loadPosts();
+    if (currentView === 'home') loadPosts();
+    else showProfile(currentUser.id);
   } catch (err) {
     alert(err.message);
   } finally {
@@ -167,7 +325,7 @@ postBtn.addEventListener('click', async () => {
   }
 });
 
-// ---------- Load Posts ----------
+// ---------- Load Posts (Home) ----------
 async function loadPosts() {
   postsList.innerHTML = '<div class="empty-state"><i data-lucide="loader"></i><p>Loading…</p></div>';
   lucide.createIcons();
@@ -176,18 +334,9 @@ async function loadPosts() {
     const { data: posts, error } = await sb
       .from('posts')
       .select(`
-        id,
-        body,
-        created_at,
-        user_id,
-        profiles!posts_user_id_fkey (
-          username,
-          display_name
-        ),
-        likes (
-          id,
-          user_id
-        )
+        id, body, created_at, user_id,
+        profiles!posts_user_id_fkey (username, display_name),
+        likes (id, user_id)
       `)
       .order('created_at', { ascending: false })
       .limit(50);
@@ -207,7 +356,6 @@ async function loadPosts() {
     postsList.innerHTML = posts.map(post => renderPost(post)).join('');
     lucide.createIcons();
 
-    // Attach like handlers
     document.querySelectorAll('.like-btn').forEach(btn => {
       btn.addEventListener('click', () => toggleLike(btn.dataset.postId, btn));
     });
@@ -231,14 +379,16 @@ function renderPost(post) {
       <div class="post-header">
         <div class="avatar">${initial}</div>
         <div class="post-meta">
-          <span class="post-author">${escapeHtml(display)}</span>
+          <span class="post-author" style="cursor:pointer;" onclick="showProfile('${post.user_id}')">
+            ${escapeHtml(display)}
+          </span>
           <span class="post-time">@${escapeHtml(username)} · ${time}</span>
         </div>
       </div>
       <div class="post-body">${escapeHtml(post.body)}</div>
       <div class="post-actions">
         <button class="action-btn like-btn ${liked ? 'liked' : ''}" data-post-id="${post.id}">
-          <i data-lucide="${liked ? 'heart' : 'heart'}"></i>
+          <i data-lucide="heart"></i>
           <span>${likeCount}</span>
         </button>
       </div>
@@ -255,12 +405,10 @@ async function toggleLike(postId, btn) {
 
   try {
     if (isLiked) {
-      // Unlike
       await sb.from('likes').delete().match({ post_id: postId, user_id: currentUser.id });
       btn.classList.remove('liked');
       countSpan.textContent = Math.max(0, count - 1);
     } else {
-      // Like
       await sb.from('likes').insert({ post_id: postId, user_id: currentUser.id });
       btn.classList.add('liked');
       countSpan.textContent = count + 1;
@@ -296,13 +444,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Listen for auth changes
   sb.auth.onAuthStateChange((event, session) => {
     if (session) loadUser();
     else showAuth();
   });
 
-  // Initial check
   await loadUser();
   lucide.createIcons();
 });
