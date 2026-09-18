@@ -70,19 +70,26 @@ authForm.addEventListener('submit', async (e) => {
       if (!username || username.length < 3) {
         throw new Error('Username must be at least 3 characters');
       }
-      const { data, error } = await sb.auth.signUp({ email, password });
+
+      // 1. Create the account
+      const { data, error } = await sb.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { username }   // we pass the username here
+        }
+      });
       if (error) throw error;
 
-      // Create profile
-      const { error: profileError } = await sb.from('profiles').insert({
-        id: data.user.id,
-        username,
-        display_name: username
-      });
-      if (profileError) throw profileError;
+      // 2. If the user is immediately logged in (no email confirmation),
+      //    update the profile with the real username
+      if (data.session) {
+        await sb.from('profiles')
+          .update({ username, display_name: username })
+          .eq('id', data.user.id);
+      }
 
-      authError.textContent = 'Account created! Check your email to confirm (if required), then log in.';
-      // Switch to login
+      authError.textContent = 'Account created! You can now log in.';
       tabLogin.click();
     } else {
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
