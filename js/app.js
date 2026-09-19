@@ -193,6 +193,14 @@ async function showProfile(userId) {
     </button>
   `;
 
+  const verifiedBadge = profile.is_verified 
+    ? `<span title="Verified" style="color:#1d9bf0; margin-left:6px;">✔</span>` 
+    : '';
+
+  const bioHtml = profile.bio 
+    ? `<p style="margin-top:0.5rem; margin-bottom:0.5rem; color:var(--text); font-size:0.95rem;">${escapeHtml(profile.bio)}</p>` 
+    : '';
+
   postsList.innerHTML = `
     <div class="post-card" style="margin-bottom:1.5rem;">
       <div style="display:flex; align-items:center; gap:1rem;">
@@ -200,8 +208,11 @@ async function showProfile(userId) {
           ${(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
         </div>
         <div>
-          <div style="font-weight:700; font-size:1.25rem;">${escapeHtml(profile.display_name || profile.username)}</div>
+          <div style="font-weight:700; font-size:1.25rem; display:flex; align-items:center;">
+            ${escapeHtml(profile.display_name || profile.username)}${verifiedBadge}
+          </div>
           <div style="color:var(--text-muted);">@${escapeHtml(profile.username)}</div>
+          ${bioHtml}
           <div style="margin-top:0.5rem; color:var(--text-muted); font-size:0.9rem;">
             <strong style="color:var(--text);">${followingCount || 0}</strong> Following
             · 
@@ -213,6 +224,7 @@ async function showProfile(userId) {
     </div>
     <div id="profile-posts"></div>
   `;
+
 
   // Follow button handler
   const followBtn = document.getElementById('follow-btn');
