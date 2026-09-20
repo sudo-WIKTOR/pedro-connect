@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pedro Connect</title>
   <link rel="stylesheet" href="css/style.css" />
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -22,22 +20,22 @@
         <p class="tagline">Connect. Share. Belong.</p>
 
         <div class="tabs">
-          <button id="tab-login" class="tab active">Login</button>
-          <button id="tab-signup" class="tab">Sign Up</button>
+          <button id="tab-login" class="tab active" type="button">Login</button>
+          <button id="tab-signup" class="tab" type="button">Sign Up</button>
         </div>
 
         <form id="auth-form">
           <div class="input-group">
             <label for="email">Email</label>
-            <input type="email" id="email" placeholder="you@example.com" required />
+            <input type="email" id="email" placeholder="you@example.com" required autocomplete="email" />
           </div>
           <div class="input-group">
             <label for="password">Password</label>
-            <input type="password" id="password" placeholder="••••••••" required minlength="6" />
+            <input type="password" id="password" placeholder="••••••••" required minlength="6" autocomplete="current-password" />
           </div>
           <div id="username-group" class="input-group hidden">
             <label for="username">Username</label>
-            <input type="text" id="username" placeholder="pedro_fan" maxlength="24" />
+            <input type="text" id="username" placeholder="pedro_fan" maxlength="24" autocomplete="username" />
           </div>
           <button type="submit" id="auth-btn" class="btn primary">Login</button>
         </form>
@@ -53,47 +51,72 @@
           <span>Pedro Connect</span>
         </div>
         <div class="user-menu">
-          <span id="current-user"></span>
-          <button id="logout-btn" class="btn icon" title="Logout">
+          <button id="current-user" class="current-user" type="button" title="Your profile"></button>
+          <button id="logout-btn" class="btn icon" title="Logout" type="button">
             <i data-lucide="log-out"></i>
           </button>
         </div>
       </header>
 
       <main class="layout">
-        <!-- Sidebar -->
         <aside class="sidebar">
-          <nav>
-            <button class="nav-item active" data-view="home">
+          <nav class="sidebar-nav">
+            <button class="nav-item active" data-view="home" type="button">
               <i data-lucide="home"></i> Home
             </button>
-            <button class="nav-item" data-view="profile">
+            <button class="nav-item" data-view="search" type="button">
+              <i data-lucide="search"></i> Search
+            </button>
+            <button class="nav-item" data-view="profile" type="button">
               <i data-lucide="user"></i> Profile
             </button>
           </nav>
         </aside>
 
-        <!-- Feed / Profile area -->
         <section class="feed">
-          <!-- Compose (only shown on Home) -->
           <div class="compose-card">
             <textarea id="post-content" placeholder="What's happening?" maxlength="280" rows="3"></textarea>
             <div class="compose-actions">
               <span id="char-count">0/280</span>
-              <button id="post-btn" class="btn primary" disabled>Post</button>
+              <button id="post-btn" class="btn primary" disabled type="button">Post</button>
             </div>
           </div>
 
-          <!-- Posts / Profile content -->
-          <div id="posts-list" class="posts-list">
-            <!-- Content injected here by JS -->
-          </div>
+          <div id="posts-list" class="posts-list"></div>
         </section>
       </main>
+
+      <nav class="mobile-nav" aria-label="Main">
+        <button class="nav-item active" data-view="home" type="button">
+          <i data-lucide="home"></i>
+          <span>Home</span>
+        </button>
+        <button class="nav-item" data-view="search" type="button">
+          <i data-lucide="search"></i>
+          <span>Search</span>
+        </button>
+        <button class="nav-item" data-view="profile" type="button">
+          <i data-lucide="user"></i>
+          <span>Profile</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <div id="modal-root" class="modal-root hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modal-title">People</h2>
+        <button id="modal-close" class="btn icon" type="button" title="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
     </div>
   </div>
 
   <script src="js/supabase-config.js"></script>
+  <script src="js/verified-badge.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

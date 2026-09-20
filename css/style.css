@@ -6,17 +6,20 @@
 }
 
 :root {
-  --bg: #000000;
-  --surface: #0a0a0a;
-  --card: #111111;
-  --border: #222222;
-  --text: #ffffff;
-  --text-muted: #888888;
-  --accent: #ffffff;
-  --danger: #ff4444;
+  --bg: #101216;
+  --surface: #171a20;
+  --card: #1c2028;
+  --border: #2d3340;
+  --text: #f3f5f7;
+  --text-muted: #a7b0bc;
+  --accent: #1da1f2;
+  --accent-hover: #1a8cd8;
+  --danger: #ff5c5c;
   --radius: 16px;
+  --radius-md: 12px;
   --radius-sm: 10px;
   --radius-full: 9999px;
+  --focus: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
 }
 
 html, body {
@@ -36,8 +39,18 @@ button, input, textarea {
   outline: none;
 }
 
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  box-shadow: var(--focus);
+}
+
 button {
   cursor: pointer;
+}
+
+a {
+  color: var(--accent);
 }
 
 /* ===== Utilities ===== */
@@ -47,6 +60,53 @@ button {
   font-size: 0.875rem;
   margin-top: 0.75rem;
   text-align: center;
+}
+
+/* ===== Verified badge (single visual) ===== */
+.user-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  max-width: 100%;
+  font-weight: 700;
+  line-height: 1.2;
+  vertical-align: middle;
+}
+
+.user-name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #ffffff;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+.verified-badge svg {
+  display: block;
+  width: 10px;
+  height: 10px;
+}
+
+.verified-badge path {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* ===== Screens ===== */
@@ -61,10 +121,11 @@ button {
 .auth-card {
   width: 100%;
   max-width: 400px;
+  margin: 1rem;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 2.5rem 2rem;
+  padding: 2.25rem 1.75rem;
   text-align: center;
 }
 
@@ -96,20 +157,21 @@ button {
 
 .tabs {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.35rem;
   margin-bottom: 1.5rem;
   background: var(--surface);
-  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   padding: 4px;
 }
 
 .tab {
   flex: 1;
   padding: 0.6rem 1rem;
-  border-radius: var(--radius-full);
+  border-radius: 8px;
   color: var(--text-muted);
-  font-weight: 500;
-  transition: all 0.2s;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
 }
 
 .tab.active {
@@ -129,17 +191,22 @@ button {
   margin-bottom: 0.35rem;
 }
 
-.input-group input {
+.input-group input,
+.search-input,
+.comment-input {
   width: 100%;
-  padding: 0.85rem 1rem;
+  padding: 0.8rem 0.95rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  transition: border-color 0.2s;
+  color: var(--text);
+  transition: border-color 0.15s;
 }
 
-.input-group input:focus {
-  border-color: var(--text);
+.input-group input:focus,
+.search-input:focus,
+.comment-input:focus {
+  border-color: var(--accent);
 }
 
 .btn {
@@ -147,21 +214,20 @@ button {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: var(--radius-full);
+  padding: 0.7rem 1.15rem;
+  border-radius: var(--radius-md);
   font-weight: 600;
-  transition: all 0.2s;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
 }
 
 .btn.primary {
-  width: 100%;
   background: var(--text);
   color: var(--bg);
-  margin-top: 0.5rem;
 }
 
 .btn.primary:hover:not(:disabled) {
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
 .btn.primary:disabled {
@@ -169,17 +235,32 @@ button {
   cursor: not-allowed;
 }
 
+.btn.outline {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn.outline:hover {
+  background: var(--surface);
+}
+
 .btn.icon {
   width: 40px;
   height: 40px;
   padding: 0;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   color: var(--text-muted);
 }
 
 .btn.icon:hover {
   background: var(--surface);
   color: var(--text);
+}
+
+#auth-btn.primary {
+  width: 100%;
+  margin-top: 0.35rem;
 }
 
 /* ===== Main Layout ===== */
@@ -195,9 +276,9 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1.5rem;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(12px);
+  gap: 1rem;
+  padding: 0.7rem 1.25rem;
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
 
@@ -206,48 +287,67 @@ button {
   align-items: center;
   gap: 0.6rem;
   font-weight: 700;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
+  min-width: 0;
 }
 
 .brand i {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
 }
 
 .user-menu {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  color: var(--text-muted);
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.current-user {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: min(220px, 46vw);
+  color: var(--text);
   font-size: 0.9rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: var(--radius-sm);
+}
+
+.current-user:hover {
+  background: var(--surface);
+}
+
+.current-user .user-name {
+  font-weight: 600;
 }
 
 .layout {
   display: grid;
-  grid-template-columns: 220px 1fr;
-  max-width: 900px;
+  grid-template-columns: 220px minmax(0, 1fr);
+  max-width: 920px;
   margin: 0 auto;
   width: 100%;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 58px);
 }
 
-/* Sidebar */
 .sidebar {
-  padding: 1.5rem 1rem;
+  padding: 1.25rem 0.85rem;
   border-right: 1px solid var(--border);
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.75rem;
   width: 100%;
-  padding: 0.85rem 1rem;
-  border-radius: var(--radius-full);
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md);
   color: var(--text-muted);
-  font-weight: 500;
-  margin-bottom: 0.35rem;
-  transition: all 0.2s;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  transition: background 0.15s, color 0.15s;
 }
 
 .nav-item:hover {
@@ -265,18 +365,26 @@ button {
   height: 20px;
 }
 
-/* Feed */
 .feed {
-  padding: 1.5rem;
-  max-width: 600px;
+  padding: 1.25rem;
+  max-width: 620px;
+  width: 100%;
+  min-width: 0;
 }
 
-.compose-card {
+.compose-card,
+.post-card,
+.profile-card,
+.search-card,
+.user-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
+}
+
+.compose-card {
+  padding: 1.1rem 1.15rem;
+  margin-bottom: 1.15rem;
 }
 
 .compose-card textarea {
@@ -285,7 +393,7 @@ button {
   background: transparent;
   color: var(--text);
   font-size: 1.05rem;
-  line-height: 1.4;
+  line-height: 1.45;
   min-height: 80px;
 }
 
@@ -297,8 +405,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
+  margin-top: 0.7rem;
+  padding-top: 0.7rem;
   border-top: 1px solid var(--border);
 }
 
@@ -309,34 +417,31 @@ button {
 
 #post-btn {
   width: auto;
-  padding: 0.55rem 1.4rem;
+  padding: 0.5rem 1.2rem;
   font-size: 0.9rem;
 }
 
-/* Posts */
 .posts-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.85rem;
+  min-width: 0;
 }
 
 .post-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem;
-  transition: border-color 0.2s;
+  padding: 1.1rem 1.15rem;
 }
 
 .post-card:hover {
-  border-color: #333;
+  border-color: #3d4554;
 }
 
 .post-header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.7rem;
+  min-width: 0;
 }
 
 .avatar {
@@ -348,7 +453,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1rem;
   color: var(--text);
   flex-shrink: 0;
@@ -357,16 +462,31 @@ button {
 .post-meta {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .post-author {
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  cursor: pointer;
+  color: var(--text);
+  background: none;
+  padding: 0;
+  text-align: left;
   font-size: 0.95rem;
+}
+
+.post-author:hover .user-name-text {
+  text-decoration: underline;
 }
 
 .post-time {
   font-size: 0.8rem;
   color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .post-body {
@@ -374,23 +494,23 @@ button {
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
 }
 
 .post-actions {
   display: flex;
-  gap: 1.5rem;
+  gap: 0.5rem;
 }
 
 .action-btn {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   color: var(--text-muted);
   font-size: 0.85rem;
-  padding: 0.35rem 0.6rem;
-  border-radius: var(--radius-full);
-  transition: all 0.2s;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
 }
 
 .action-btn:hover {
@@ -399,7 +519,7 @@ button {
 }
 
 .action-btn.liked {
-  color: var(--text);
+  color: #ff6b81;
 }
 
 .action-btn i {
@@ -409,29 +529,302 @@ button {
 
 .empty-state {
   text-align: center;
-  padding: 3rem 1rem;
+  padding: 2.5rem 1rem;
   color: var(--text-muted);
 }
 
 .empty-state i {
-  width: 48px;
-  height: 48px;
-  margin-bottom: 1rem;
-  opacity: 0.5;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 0.85rem;
+  opacity: 0.55;
 }
 
-/* Responsive */
-@media (max-width: 700px) {
+/* Comments */
+.comments-section {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.7rem;
+}
+
+.comment-item {
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.7rem 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  min-width: 0;
+}
+
+.comment-avatar {
+  width: 32px;
+  height: 32px;
+  font-size: 0.8rem;
+}
+
+.comment-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.comment-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.45rem;
+  min-width: 0;
+  margin-bottom: 0.2rem;
+}
+
+.comment-meta .user-name {
+  font-size: 0.9rem;
+}
+
+.comment-meta span {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.comment-body {
+  font-size: 0.92rem;
+  word-break: break-word;
+}
+
+.comment-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.comment-input {
+  flex: 1;
+}
+
+.comment-submit {
+  flex-shrink: 0;
+  padding: 0.65rem 0.95rem;
+  background: var(--text);
+  color: var(--bg);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.comment-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.comment-loading {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  padding: 0.4rem 0.2rem;
+}
+
+/* Profile */
+.profile-card {
+  padding: 1.25rem;
+}
+
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  font-size: 1.45rem;
+}
+
+.profile-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.profile-display {
+  font-size: 1.25rem;
+}
+
+.profile-handle {
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-bio {
+  margin-top: 0.55rem;
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+.profile-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 0.7rem;
+}
+
+.stat-btn {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 0.15rem 0;
+  border-radius: 4px;
+}
+
+.stat-btn strong {
+  color: var(--text);
+  margin-right: 0.2rem;
+}
+
+.stat-btn:hover {
+  text-decoration: underline;
+}
+
+.profile-actions {
+  margin-top: 0.9rem;
+}
+
+/* Search & user cards */
+.search-card {
+  padding: 0.9rem;
+  margin-bottom: 0.85rem;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.85rem;
+  text-align: left;
+  color: inherit;
+}
+
+.user-card:hover {
+  border-color: #3d4554;
+}
+
+.user-card-meta {
+  min-width: 0;
+  flex: 1;
+}
+
+.user-card-handle {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Modal */
+.modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(8, 10, 14, 0.72);
+}
+
+.modal-card {
+  width: min(440px, 100%);
+  max-height: min(80vh, 640px);
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+  font-size: 1.05rem;
+}
+
+.modal-body {
+  overflow: auto;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 720px) {
   .layout {
     grid-template-columns: 1fr;
+    min-height: calc(100vh - 58px - 64px);
   }
+
   .sidebar {
     display: none;
   }
+
   .feed {
-    padding: 1rem;
+    padding: 0.9rem 0.85rem 5.5rem;
   }
+
   .topbar {
-    padding: 0.75rem 1rem;
+    padding: 0.65rem 0.85rem;
+  }
+
+  .brand span {
+    font-size: 1rem;
+  }
+
+  .mobile-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 0.35rem 0.4rem calc(0.35rem + env(safe-area-inset-bottom));
+  }
+
+  .mobile-nav .nav-item {
+    flex-direction: column;
+    gap: 0.15rem;
+    margin: 0;
+    font-size: 0.7rem;
+    padding: 0.45rem 0.2rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .profile-header {
+    flex-direction: column;
+  }
+
+  .comment-form {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
