@@ -62,24 +62,51 @@ a {
   text-align: center;
 }
 
-/* Verified badge */
+/* ===== Verified badge (single visual) ===== */
+.user-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  max-width: 100%;
+  font-weight: 700;
+  line-height: 1.2;
+  vertical-align: middle;
+}
+
+.user-name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
 .verified-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #ffffff;
+  line-height: 0;
+  vertical-align: middle;
+}
 
-    width: 20px;
-    height: 20px;
+.verified-badge svg {
+  display: block;
+  width: 10px;
+  height: 10px;
+}
 
-    border-radius: 50%;
-    background: #1d9bf0;
-    color: white;
-
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1;
-
-    flex-shrink: 0;
+.verified-badge path {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* ===== Screens ===== */
