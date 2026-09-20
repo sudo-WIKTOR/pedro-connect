@@ -62,7 +62,8 @@ a {
   text-align: center;
 }
 
-/* ===== Verified badge (single visual) ===== */
+/* ===== Verified Badge ===== */
+
 .user-name {
   display: inline-flex;
   align-items: center;
@@ -81,34 +82,134 @@ a {
   min-width: 0;
 }
 
+
+/* ===== X-style Wobbly Verified Badge ===== */
+
 .verified-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 15px;
-  height: 15px;
+
+  width: 19px;
+  height: 19px;
+
   flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #ffffff;
+  position: relative;
+  top: 1px;
+
   line-height: 0;
   vertical-align: middle;
+
+  cursor: default;
+
+  transition:
+    transform 160ms ease,
+    filter 160ms ease;
 }
 
-.verified-badge svg {
+
+/* SVG */
+
+.verified-badge-svg {
   display: block;
-  width: 10px;
-  height: 10px;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: visible;
 }
 
-.verified-badge path {
+
+/* Blue wobbly/scalloped badge */
+
+.verified-badge-shape {
+  fill: #1d9bf0;
+
+  filter:
+    drop-shadow(
+      0 1px 2px rgba(0, 0, 0, 0.18)
+    );
+}
+
+
+/* White check */
+
+.verified-badge-check {
   fill: none;
+
   stroke: #ffffff;
-  stroke-width: 2.4;
+  stroke-width: 9;
+
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
+
+/* ===== Badge Hover ===== */
+
+.verified-badge:hover {
+  transform: scale(1.12) rotate(-2deg);
+
+  filter:
+    drop-shadow(
+      0 2px 5px rgba(29, 155, 240, 0.35)
+    );
+}
+
+
+/* ===== Optional subtle wobble ===== */
+
+@keyframes verifiedWobble {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-1deg);
+  }
+
+  50% {
+    transform: rotate(1deg);
+  }
+
+  75% {
+    transform: rotate(-0.5deg);
+  }
+
+}
+
+.verified-badge.wobble {
+  animation:
+    verifiedWobble 3s ease-in-out infinite;
+}
+
+
+/* ===== Badge Sizes ===== */
+
+.user-name.small .verified-badge {
+  width: 16px;
+  height: 16px;
+}
+
+.user-name.large .verified-badge {
+  width: 24px;
+  height: 24px;
+}
+
+
+/* ===== Accessibility ===== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .verified-badge,
+  .verified-badge.wobble {
+    animation: none;
+    transition: none;
+  }
+
+}
 /* ===== Screens ===== */
 .screen {
   min-height: 100vh;
