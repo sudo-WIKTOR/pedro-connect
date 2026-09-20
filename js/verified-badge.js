@@ -30,62 +30,71 @@
     );
   }
 
-  function renderVerifiedBadge(source) {
-    if (!isVerified(source)) return '';
+ function renderVerifiedBadge(source) {
+  if (!isVerified(source)) return '';
 
-    return `
-      <span
-        class="verified-badge"
-        title="Verified"
-        aria-label="Verified"
-        role="img"
+  return `
+    <span
+      class="verified-badge"
+      title="Verified"
+      aria-label="Verified"
+      role="img"
+    >
+      <svg
+        class="verified-badge-svg"
+        viewBox="0 0 100 100"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        focusable="false"
       >
-        <svg
-          class="verified-badge-svg"
-          viewBox="0 0 100 100"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-          focusable="false"
-        >
 
-          <!-- Wobbly / scalloped badge -->
-          <path
-            class="verified-badge-shape"
-            d="
-              M50 3
-              C56 3 61 9 65 12
-              C70 9 78 9 82 13
-              C86 17 85 24 88 28
-              C94 30 98 35 97 41
-              C96 47 91 51 92 55
-              C94 61 91 67 86 70
-              C87 76 83 82 77 84
-              C72 85 68 82 64 86
-              C60 91 55 97 50 97
-              C44 97 40 91 36 86
-              C32 82 28 85 23 84
-              C17 82 13 76 14 70
-              C9 67 6 61 8 55
-              C9 51 4 47 3 41
-              C2 35 6 30 12 28
-              C15 24 14 17 18 13
-              C22 9 30 9 35 12
-              C39 9 44 3 50 3
-              Z
-            "
-          />
+        <!-- WOBBLY BLUE VERIFIED BADGE -->
+        <path
+          class="verified-badge-shape"
+          d="
+            M50 2
 
-          <!-- White check -->
-          <path
-            class="verified-badge-check"
-            d="M27 51 L43 67 L73 34"
-          />
+            C57 2 62 8 65 13
+            C71 10 78 9 83 14
+            C87 18 87 24 87 29
 
-        </svg>
-      </span>
-    `;
-  }
+            C94 31 98 36 98 43
+            C98 49 93 53 90 56
 
+            C93 62 91 69 86 73
+            C82 77 77 77 72 76
+
+            C70 83 65 88 59 89
+            C55 90 52 96 50 98
+
+            C45 98 42 91 38 89
+            C32 88 28 83 27 77
+
+            C21 78 16 76 13 71
+            C10 66 10 61 12 56
+
+            C7 53 2 48 2 42
+            C2 35 7 31 13 29
+
+            C13 23 14 18 19 14
+            C24 10 30 11 35 13
+
+            C39 7 44 2 50 2
+            Z
+          "
+        />
+
+        <!-- WHITE CHECK -->
+        <path
+          class="verified-badge-check"
+          d="M27 51 L43 67 L73 34"
+        />
+
+      </svg>
+    </span>
+  `;
+}
+  
   function renderUserName(profile, options) {
     const opts = options || {};
 
